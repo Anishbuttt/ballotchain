@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "any": "cpp",
+        "atomic": "cpp",
+        "chrono": "cpp",
+        "format": "cpp",
+        "fstream": "cpp",
+        "functional": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "ostream": "cpp",
+        "span": "cpp",
+        "sstream": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp",
+        "variant": "cpp",
+        "xmemory": "cpp",
+        "xutility": "cpp",
+        "*.ipp": "cpp"
+    }
+}

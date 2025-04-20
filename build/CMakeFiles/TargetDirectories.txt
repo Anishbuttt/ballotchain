@@ -1,0 +1,4 @@
+D:/SEM4/algorithm/ballotchain/build/CMakeFiles/client.dir
+D:/SEM4/algorithm/ballotchain/build/CMakeFiles/server.dir
+D:/SEM4/algorithm/ballotchain/build/CMakeFiles/ALL_BUILD.dir
+D:/SEM4/algorithm/ballotchain/build/CMakeFiles/ZERO_CHECK.dir

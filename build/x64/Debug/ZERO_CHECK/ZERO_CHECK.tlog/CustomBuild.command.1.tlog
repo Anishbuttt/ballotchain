@@ -1,0 +1,10 @@
+^D:\SEM4\ALGORITHM\BALLOTCHAIN\BUILD\CMAKEFILES\9F497E449657CB682A17306935C75A22\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SD:/SEM4/algorithm/ballotchain -BD:/SEM4/algorithm/ballotchain/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/SEM4/algorithm/ballotchain/build/BallotChain.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

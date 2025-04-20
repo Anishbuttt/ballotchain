@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\SEM4\algorithm\ballotchain\build\CMakeFiles\9f497e449657cb682a17306935c75a22\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{CF76A89B-DDA5-3212-AF2E-BE0D36935010}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
