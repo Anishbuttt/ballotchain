@@ -1,45 +1,81 @@
 cmake_minimum_required(VERSION 3.10)
 project(BallotChain)
 
-# Use C++17
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Set output directories for binaries
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Include directories
-include_directories(
-    ./blockchain
-    ./crypto
-    ./utils
+file(GLOB_RECURSE BLOCKCHAIN_SRC CONFIGURE_DEPENDS
+    ${PROJECT_SOURCE_DIR}/blockchain/*.cpp
+    ${PROJECT_SOURCE_DIR}/blockchain/*.cpp
 )
-include_directories(
+file(GLOB_RECURSE CRYPTO_SRC CONFIGURE_DEPENDS
+    ${PROJECT_SOURCE_DIR}/crypto/*.cpp
+)
+file(GLOB_RECURSE UTILS_SRC CONFIGURE_DEPENDS
+    ${PROJECT_SOURCE_DIR}/utils/*.cpp
+)
+
+# Only remove blocktest, keep block.cpp!
+list(REMOVE_ITEM BLOCKCHAIN_SRC
+    "${PROJECT_SOURCE_DIR}/blockchain/blocktest.cpp"
+)
+
+set(COMMON_SRC
+    ${BLOCKCHAIN_SRC}
+    ${CRYPTO_SRC}
+    ${UTILS_SRC}
+)
+
+message(STATUS "Include directories for client: ${PROJECT_SOURCE_DIR}/blockchain")
+message(STATUS "Include directories for server: ${PROJECT_SOURCE_DIR}/blockchain")
+
+
+# ✅ One proper client definition
+add_executable(client
+    client/client.cpp
+    ${COMMON_SRC}
+)
+target_include_directories(client PRIVATE
+    blockchain
+    ../blockchain/blockchain.hpp
+    crypto
+    utils
     ${PROJECT_SOURCE_DIR}/libs/asio/asio/include
 )
+target_compile_definitions(client PRIVATE _WIN32_WINNT=0x0601)
 
-# Source files
-file(GLOB_RECURSE BLOCKCHAIN_SRC ./blockchain/*.cpp)
-file(GLOB_RECURSE CRYPTO_SRC ./crypto/*.cpp)
-file(GLOB_RECURSE UTILS_SRC ./utils/*.cpp)
-
-# Client executable
-add_executable(client
-    ./client/client.cpp
-    ${BLOCKCHAIN_SRC}
-    ${CRYPTO_SRC}
-    ${UTILS_SRC}
-)
-
-# Server executable
+# ✅ One proper server definition
 add_executable(server
-    ./server/server.cpp
-    ${BLOCKCHAIN_SRC}
-    ${CRYPTO_SRC}
-    ${UTILS_SRC}
+    server/server.cpp
+    ${COMMON_SRC}
 )
+target_include_directories(server PRIVATE
+    blockchain
+    ../blockchain/blockchain.hpp
+    crypto
+    utils
+    ${PROJECT_SOURCE_DIR}/libs/asio/asio/include
+)
+target_compile_definitions(server PRIVATE _WIN32_WINNT=0x0601)
 
-# Optional: Add OpenSSL if needed
-# find_package(OpenSSL REQUIRED)
-# target_link_libraries(client OpenSSL::Crypto)
-# target_link_libraries(server OpenSSL::Crypto)
+# ✅ Block test
+add_executable(blocktest
+    blockchain/blocktest.cpp
+    blockchain/block.cpp
+    blockchain/blockchain.cpp
+)
+target_include_directories(blocktest PRIVATE
+    blockchain
+    crypto
+    utils
+)
+target_compile_definitions(blocktest PRIVATE _WIN32_WINNT=0x0601)
+
+# ✅ OpenSSL linking
+find_package(OpenSSL REQUIRED)
+target_link_libraries(client PRIVATE OpenSSL::Crypto)
+target_link_libraries(server PRIVATE OpenSSL::Crypto)
+target_link_libraries(blocktest PRIVATE OpenSSL::Crypto)

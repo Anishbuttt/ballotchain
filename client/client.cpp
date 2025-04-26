@@ -1,43 +1,79 @@
-#include <iostream>
 #include <asio.hpp>
+#include <iostream>
+#include <limits>
 
-using namespace std;
 using asio::ip::tcp;
 
-int main() {
-    try {
-        // Set up context
+int main() 
+{
+    try 
+    {
         asio::io_context io_context;
-
-        // Resolve the server's address and port
         tcp::resolver resolver(io_context);
         auto endpoints = resolver.resolve("127.0.0.1", "12345");
-
-        // Create a socket and connect
         tcp::socket socket(io_context);
         asio::connect(socket, endpoints);
 
-        cout << "✅ Connected to the server." << endl;
+        std::cout << "Connected to BallotChain server." << std::endl;
 
-        // Prompt the user for their vote
-        string vote;
-        cout << "🗳️ Enter your vote: ";
-        getline(cin, vote);
+        while (true) 
+        {
+            std::cout << "\n1. Cast Vote\n2. Exit\nChoice: ";
+            int choice;
+            std::cin >> choice;
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        // Send the vote to the server (add newline so server knows where to stop)
-        vote += '\n';
-        asio::write(socket, asio::buffer(vote));
+            if (choice == 1)
+            {
+                std::string voter, candidate;
+                std::cout << "Voter Name: ";
+                std::getline(std::cin, voter);
+                std::cout << "Candidate Name: ";
+                std::getline(std::cin, candidate);
 
-        cout << "📤 Vote sent. Waiting for response..." << endl;
+                std::string request = "VOTE|" + voter + "|" + candidate + "\n";
+                asio::write(socket, asio::buffer(request));
 
-        // Receive response from the server
-        string response;
-        asio::read_until(socket, asio::dynamic_buffer(response), '\n');
+                asio::streambuf response;
+                asio::read_until(socket, response, "\n");
+                std::istream input(&response);
+                std::string reply;
+                std::getline(input, reply);
+                std::cout << "Server says: " << reply << std::endl;
+            } 
+            else if (choice == 2) 
+            {
+                std::string request = "GET_CHAIN\n";
+                asio::write(socket, asio::buffer(request));
 
-        cout << "📩 Response from server: " << response << endl;
-    }
-    catch (exception& e) {
-        cerr << "❌ Error: " << e.what() << endl;
+                // Read until END_OF_CHAIN marker
+                asio::streambuf response;
+                std::ostringstream chainData;
+                while (true) 
+                {
+                    asio::read_until(socket, response, "\n");
+                    std::istream input(&response);
+                    std::string line;
+                    std::getline(input, line);
+                    if (line == "END_OF_CHAIN") break;
+                    chainData << line << "\n";
+                }
+                std::cout << "--- Blockchain ---\n";
+                std::cout << chainData.str();
+                std::cout << "------------------\n";
+
+            } 
+            else 
+            {
+                // Send exit command to server and break
+                std::string request = "EXIT\n";
+                asio::write(socket, asio::buffer(request));
+                break;
+            }
+        }
+        
+    } catch (std::exception& e) {
+        std::cerr << "Client error: " << e.what() << std::endl;
     }
 
     return 0;

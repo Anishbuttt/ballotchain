@@ -17,12 +17,14 @@ public:
 
     std::string calculateHash() const;
     std::string getHash() const;
+    std::string getPreviousHash() const;
     std::time_t getTimestamp() const;
     std::string getData() const;
 
-    void printBlock() const; // ✅ ADDED THIS
+    bool isValid() const;
+    void printBlock() const;
 
-
+    std::string toString() const;
 
 };
 

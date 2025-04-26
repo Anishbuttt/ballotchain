@@ -1,31 +1,37 @@
 #include "block.hpp"
 #include <iostream>
-#include <string>
-#include <ctime>
+#include <iomanip>
 #include <sstream>
-#include <ctime>
-#include<iomanip>
-
-//#include <openssl/sha.h>
+#include <openssl/sha.h>
 
 using namespace std;
 
-Block::Block(int idx, const std::string& prevHash, const std::string& data)
-    : index(idx), previousHash(prevHash), data(data), timestamp(std::time(0)) {
+Block::Block(int idx, const string& prevHash, const string& data)
+    : index(idx), previousHash(prevHash), data(data), timestamp(std::time(nullptr)) {
     hash = calculateHash();
 }
 
-std::string Block::calculateHash() const {
-    std::stringstream ss;
+string Block::calculateHash() const {
+    stringstream ss;
     ss << index << previousHash << data << timestamp;
-    std::string toHash = ss.str();
+    string input = ss.str();
 
-    // Placeholder for real hash logic (or plug in SHA256)
-    return std::to_string(std::hash<std::string>{}(toHash));
+    unsigned char hashResult[SHA256_DIGEST_LENGTH];
+    SHA256(reinterpret_cast<const unsigned char*>(input.c_str()), input.size(), hashResult);
+
+    std::stringstream hexStream;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+        hexStream << hex << setw(2) << setfill('0') << static_cast<int>(hashResult[i]);
+
+    return hexStream.str();
 }
 
-std::string Block::getHash() const {
+string Block::getHash() const {
     return hash;
+}
+
+string Block::getPreviousHash() const {
+    return previousHash;
 }
 
 std::time_t Block::getTimestamp() const {
@@ -36,25 +42,28 @@ std::string Block::getData() const {
     return data;
 }
 
-
+bool Block::isValid() const {
+    return hash == calculateHash();
+}
 
 void Block::printBlock() const {
     std::cout << "----------------------------------" << std::endl;
     std::cout << "Block Index: " << index << std::endl;
-    std::cout << "Timestamp: " << std::put_time(std::localtime(&timestamp), "%Y-%m-%d %H:%M:%S") << std::endl;
+    std::cout << "Timestamp: " << std::put_time(localtime(&timestamp), "%Y-%m-%d %H:%M:%S") << std::endl;
     std::cout << "Data: " << data << std::endl;
     std::cout << "Hash: " << hash << std::endl;
     std::cout << "Previous Hash: " << previousHash << std::endl;
+    std::cout << "Valid: " << (isValid() ? "Yes" : "No") << std::endl;
     std::cout << "----------------------------------" << std::endl;
 }
 
 
-int main() {
-    Block b1(0, "0", "Vote: Alice");
-    b1.printBlock();
-
-    Block b2(1, b1.getHash(), "Vote: Bob");
-    b2.printBlock();
-
-    return 0;
+string Block::toString() const {
+    ostringstream ss;
+    ss << "Index: " << index
+       << " | Timestamp: " << std::put_time(std::localtime(&timestamp), "%Y-%m-%d %H:%M:%S")
+       << " | Data: " << data
+       << " | Hash: " << hash
+       << " | PrevHash: " << previousHash;
+    return ss.str();
 }

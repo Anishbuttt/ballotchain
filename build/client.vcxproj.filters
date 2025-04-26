@@ -7,7 +7,7 @@
     <ClCompile Include="D:\SEM4\algorithm\ballotchain\blockchain\block.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\SEM4\algorithm\ballotchain\crypto\rsa.utils.cpp">
+    <ClCompile Include="D:\SEM4\algorithm\ballotchain\blockchain\blockchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

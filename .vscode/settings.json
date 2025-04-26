@@ -18,6 +18,7 @@
         "variant": "cpp",
         "xmemory": "cpp",
         "xutility": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "iosfwd": "cpp"
     }
 }
